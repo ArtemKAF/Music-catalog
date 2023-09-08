@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ super() }}
+<div class="container py-5">
+  {% for singer in singers %}
+  <div class="card-header">
+    {{ singer.id }}. <a href="{{ url_for('profile', username=singer.name) }}">{{ singer.name }}</a>
+  </div>
+  <div class="card-body">
+    {{ singer.album_name }}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
