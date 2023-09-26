@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ super() }}
+<div class="container py-5">
+  {% for song in songs %}
+  <div class="card-header">
+    {{ song.id }}. {{ song.name }}
+  </div>
+  <div>
+    {{ song.albums }}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
