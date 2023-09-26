@@ -1,5 +1,6 @@
-from music_catalog import db
 from sqlalchemy.orm import declared_attr
+
+from music_catalog import db
 
 
 class Base(db.Model):
@@ -20,12 +21,17 @@ class Singer(Base):
     albums = db.relationship(
         "Album",
         backref=db.backref("singer", lazy="joined"),
-        lazy="dynamic"
+        lazy="joined",
     )
 
 
 class Song(Base):
-    pass
+    albums = db.relationship(
+        "Album",
+        secondary="album_songs",
+        back_populates=("songs"),
+        lazy="joined",
+    )
 
 
 class Album(Base):
@@ -33,7 +39,8 @@ class Album(Base):
     songs = db.relationship(
         "Song",
         secondary="album_songs",
-        backref=db.backref("songs", lazy="dynamic"),
+        back_populates=("albums"),
+        lazy="joined",
     )
 
 
