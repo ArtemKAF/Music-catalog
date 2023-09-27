@@ -9,12 +9,15 @@
 {% endfor %}
 <form action="" method="POST" style="margin: 10px;">
   {{ form.hidden_tag() }}
+  {% for field in form if field.name not in ["csrf_token", "remember", "submit"] %}
   <div class="mb-3">
-    <p>{{ form.email.label(class="form-label") }} {{ form.email(class="form-control") }}</p>
+    {{ field.label(class="form-label") }}
+    {{ field(class="form-control") }}
+    {% for error in field.errors %}
+    <div class="error">{{ error }}</div>
+    {% endfor %}
   </div>
-  <div class="mb-3">
-    <p>{{ form.psw.label(class="form-label") }} {{ form.psw(class="form-control") }}</p>
-  </div>
+  {% endfor %}
   <div class="form-check form-switch">
     <p>{{ form.remember(class="form-check-input", id="flexSwitchCheckDefault") }}
       {{ form.remember.label(class="form-check-label", for="flexSwitchCheckDefault") }}</p>
