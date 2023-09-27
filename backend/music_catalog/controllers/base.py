@@ -5,6 +5,8 @@ from flask import (
 from music_catalog.controllers.utils import get_menu
 from music_catalog.models import Album, Singer, Song
 
+from ..forms.forms import LoginForm
+
 
 def get_index():
     return render_template(
@@ -36,19 +38,18 @@ def get_post_contact():
 
 
 def get_post_login():
-    if "userLogged" in session:
-        return redirect(url_for("profile", username=session.get("userLogged")))
-    elif (
-        request.method == "POST"
-        and request.form.get("username") == "admin"
-        and request.form.get("psw") == "admin"
-    ):
-        session["userLogged"] = request.form.get("username")
-        return redirect(url_for("profile", username=session.get("userLogged")))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = form.email.data
+        password = form.psw.data
+        if user == "admin@mail.ru" and password == "1234":
+            return redirect(url_for("profile", username="Admin"))
+    flash("Некорректные авторизационные данные!", "error")
     return render_template(
         "login.html",
         tittle="Авторизация",
         menu=get_menu(),
+        form=form,
     )
 
 
