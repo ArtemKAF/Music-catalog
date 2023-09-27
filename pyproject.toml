@@ -1,0 +1,23 @@
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401", "E402", "F403"]
+
+[tool.flake8]
+"exclude" = [
+    ".git",
+    ".vscode",
+    ".idea",
+    "venv",
+    "__pycache__",
+    "infra",
+    "migrations",
+    "config"
+]
+per-file-ignores = [
+"./backend/config/settings.py:E501",
+"./backend/music_catalog/__init__.py:F401,E402,F403"
+]
+
+[tool.isort]
+"profile" = "django"
+"skip" = ["venv", "migrations", "__init__.py"]
+"src_paths" = ["backend"]

@@ -8,7 +8,9 @@
     {{ singer.id }}. <a href="{{ url_for('profile', username=singer.name) }}">{{ singer.name }}</a>
   </div>
   <div class="card-body">
-    {{ singer.album_name }}
+    {% for album in singer.albums %}
+    <p>{{ album.name }}</p>
+    {% endfor %}
   </div>
   {% endfor %}
 </div>
