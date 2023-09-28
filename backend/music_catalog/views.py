@@ -1,7 +1,8 @@
 from music_catalog import music_catalog
 from music_catalog.controllers.base import (
     get_about, get_albums, get_index, get_post_contact, get_post_login,
-    get_singers, get_songs, get_user_profile, get_user_profile_id,
+    get_post_register, get_singers, get_songs, get_user_profile,
+    get_user_profile_id,
 )
 
 
@@ -18,6 +19,11 @@ def about():
 @music_catalog.route("/contact", methods=["GET", "POST", ])
 def contact():
     return get_post_contact()
+
+
+@music_catalog.route("/register", methods=["GET", "POST", ])
+def register():
+    return get_post_register()
 
 
 @music_catalog.route("/login", methods=["GET", "POST", ])

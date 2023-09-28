@@ -2,9 +2,9 @@ from flask import (
     abort, flash, redirect, render_template, request, session, url_for,
 )
 
-from music_catalog.controllers.utils import get_menu
-from music_catalog.forms.forms import LoginForm
-from music_catalog.models.catalogs import Album, Singer, Song
+from music_catalog.controllers.utils import get_menu, save_in_db
+from music_catalog.forms.forms import LoginForm, RegisterForm
+from music_catalog.models import Album, Singer, Song, User
 
 
 def get_index():
@@ -39,15 +39,41 @@ def get_post_contact():
 def get_post_login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user = form.email.data
-        password = form.psw.data
-        if user == "admin@mail.ru" and password == "1234":
+        email = form.email.data
+        password = form.password.data
+        if email == "admin@mail.ru" and password == "1234":
             return redirect(url_for("profile", username="Admin"))
         else:
             flash("Некорректные авторизационные данные!", "error")
     return render_template(
         "login.html",
         tittle="Авторизация",
+        menu=get_menu(),
+        form=form,
+    )
+
+
+def get_post_register():
+    form = RegisterForm(request.form)
+    if request.method == "POST" and form.validate_on_submit():
+        user = User(
+            name=request.form["name"],
+            email=request.form["email"],
+            password_hash=request.form["password"]
+            )
+        try:
+            save_in_db(user)
+        except Exception as error:
+            flash(
+                f"{error.args[0]} - {error.args[1]}",
+                category="error"
+            )
+        return redirect(url_for("login"))
+    else:
+        flash("Некорректные регистрационные данные!", "error")
+    return render_template(
+        "register.html",
+        tittle="Регистрация",
         menu=get_menu(),
         form=form,
     )
