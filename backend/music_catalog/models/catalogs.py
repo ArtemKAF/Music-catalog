@@ -28,7 +28,7 @@ class Singer(Base):
 class Song(Base):
     albums = db.relationship(
         "Album",
-        secondary="album_songs",
+        secondary="albums_songs",
         back_populates=("songs"),
         lazy="joined",
     )
@@ -38,18 +38,15 @@ class Album(Base):
     singer_id = db.Column(db.Integer(), db.ForeignKey("singers.id"))
     songs = db.relationship(
         "Song",
-        secondary="album_songs",
+        secondary="albums_songs",
         back_populates=("albums"),
         lazy="joined",
     )
 
 
-album_songs = db.Table(
-    "album_songs",
+albums_songs = db.Table(
+    "albums_songs",
     db.Column("album_id", db.Integer(), db.ForeignKey("albums.id")),
     db.Column("song_id", db.Integer(), db.ForeignKey("songs.id")),
+    db.Column("position", db.Integer()),
 )
-
-
-class Menu(Base):
-    url = db.Column(db.String(255), unique=True, nullable=False)

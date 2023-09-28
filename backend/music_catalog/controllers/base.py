@@ -3,9 +3,8 @@ from flask import (
 )
 
 from music_catalog.controllers.utils import get_menu
-from music_catalog.models import Album, Singer, Song
-
-from ..forms.forms import LoginForm
+from music_catalog.forms.forms import LoginForm
+from music_catalog.models.catalogs import Album, Singer, Song
 
 
 def get_index():
@@ -38,13 +37,14 @@ def get_post_contact():
 
 
 def get_post_login():
-    form = LoginForm()
+    form = LoginForm(request.form)
     if form.validate_on_submit():
         user = form.email.data
         password = form.psw.data
         if user == "admin@mail.ru" and password == "1234":
             return redirect(url_for("profile", username="Admin"))
-    flash("Некорректные авторизационные данные!", "error")
+        else:
+            flash("Некорректные авторизационные данные!", "error")
     return render_template(
         "login.html",
         tittle="Авторизация",
