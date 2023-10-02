@@ -1,9 +1,11 @@
 from music_catalog import music_catalog
-from music_catalog.controllers.base import (
-    get_about, get_albums, get_index, get_post_contact, get_post_login,
-    get_post_register, get_singers, get_songs, get_user_profile,
-    get_user_profile_id,
+
+from .controllers.base import (
+    get_about, get_albums, get_index, get_logout, get_post_contact,
+    get_post_login, get_post_register, get_singers, get_songs,
+    get_user_profile, get_user_profile_id,
 )
+from .controllers.utils import login_required
 
 
 @music_catalog.route("/")
@@ -17,6 +19,7 @@ def about():
 
 
 @music_catalog.route("/contact", methods=["GET", "POST", ])
+@login_required
 def contact():
     return get_post_contact()
 
@@ -29,6 +32,11 @@ def register():
 @music_catalog.route("/login", methods=["GET", "POST", ])
 def login():
     return get_post_login()
+
+
+@music_catalog.route("/logout", methods=["GET", ])
+def logout():
+    return get_logout()
 
 
 @music_catalog.route("/profile/<username>")

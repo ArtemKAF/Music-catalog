@@ -1,12 +1,14 @@
 from flask import (
     abort, flash, redirect, render_template, request, session, url_for,
 )
+from werkzeug.security import generate_password_hash
 
-from music_catalog.controllers.utils import get_menu, save_in_db
-from music_catalog.forms.forms import LoginForm, RegisterForm
-from music_catalog.models import Album, Singer, Song, User
+from ..forms.forms import LoginForm, RegisterForm
+from ..models import Album, Singer, Song, User
+from .utils import get_menu, login_required, save_in_db
 
 
+@login_required
 def get_index():
     return render_template(
         "index.html",
@@ -37,12 +39,23 @@ def get_post_contact():
 
 
 def get_post_login():
+    if "userLogged" in session:
+        return redirect(
+            request.args.get("next", default=None)
+            or url_for("profile", username=session.get("userLogged"))
+        )
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        if email == "admin@mail.ru" and password == "1234":
-            return redirect(url_for("profile", username="Admin"))
+        user = User.query.filter_by(email=form.email.data).first()
+        if (
+            user is not None
+            or user.password_hash == generate_password_hash(form.password.data)
+        ):
+            session["userLogged"] = user.name
+            return redirect(
+                request.args.get("next", default=None)
+                or url_for("profile", username=session.get("userLogged"))
+            )
         else:
             flash("Некорректные авторизационные данные!", "error")
     return render_template(
@@ -59,7 +72,7 @@ def get_post_register():
         user = User(
             name=request.form["name"],
             email=request.form["email"],
-            password_hash=request.form["password"]
+            password_hash=generate_password_hash(request.form["password"])
             )
         try:
             save_in_db(user)
@@ -79,20 +92,32 @@ def get_post_register():
     )
 
 
+def get_logout():
+    if "userLogged" in session:
+        session.pop("userLogged")
+    return redirect(url_for("index"))
+
+
 def get_user_profile(username):
     if "userLogged" not in session or session.get("userLogged") != username:
         abort(401)
+    user = User.query.filter_by(name=username).first()
     return render_template(
         "profile.html",
-        title=f"Профиль пользователя {username}",
+        title=f"Профиль пользователя {user.name}",
+        user=user,
         menu=get_menu(),
     )
 
 
 def get_user_profile_id(id):
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        abort(404)
     return render_template(
         "profile.html",
-        title=f"Профиль пользователя {id}",
+        title=f"Профиль пользователя {user.name}",
+        user=user,
         menu=get_menu(),
     )
 
