@@ -4,7 +4,7 @@ from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.schema import MetaData
-
+from flask_login import LoginManager
 
 music_catalog = Flask(__name__)
 music_catalog.config.from_object(os.getenv("FLASK_ENV") or "config.settings")
@@ -20,6 +20,9 @@ convention = {
 metadata_obj = MetaData(naming_convention=convention)
 
 db = SQLAlchemy(music_catalog, metadata=metadata_obj)
+
+login_manager = LoginManager(music_catalog)
+login_manager.login_view = "login"
 
 toolbar = DebugToolbarExtension(music_catalog)
 

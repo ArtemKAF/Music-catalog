@@ -1,14 +1,14 @@
 from flask import (
     abort, flash, redirect, render_template, request, session, url_for,
 )
+from flask_login import current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash
 
 from ..forms.forms import LoginForm, RegisterForm
 from ..models import Album, Singer, Song, User
-from .utils import get_menu, login_required, save_in_db
+from .utils import get_menu, save_in_db
 
 
-@login_required
 def get_index():
     return render_template(
         "index.html",
@@ -39,10 +39,10 @@ def get_post_contact():
 
 
 def get_post_login():
-    if "userLogged" in session:
+    if current_user.is_authenticated:
         return redirect(
             request.args.get("next", default=None)
-            or url_for("profile", username=session.get("userLogged"))
+            or url_for("profile", id=session.get("_user_id"))
         )
     form = LoginForm(request.form)
     if form.validate_on_submit():
@@ -51,11 +51,11 @@ def get_post_login():
             user is not None
             or user.password_hash == generate_password_hash(form.password.data)
         ):
-            session["userLogged"] = user.name
+            login_user(user, remember=form.remember_me.data)
             return redirect(
-                request.args.get("next", default=None)
-                or url_for("profile", username=session.get("userLogged"))
-            )
+                    request.args.get("next", default=None)
+                    or url_for("profile", id=session.get("_user_id"))
+                )
         else:
             flash("Некорректные авторизационные данные!", "error")
     return render_template(
@@ -93,8 +93,7 @@ def get_post_register():
 
 
 def get_logout():
-    if "userLogged" in session:
-        session.pop("userLogged")
+    logout_user()
     return redirect(url_for("index"))
 
 

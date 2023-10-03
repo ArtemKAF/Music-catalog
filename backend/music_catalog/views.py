@@ -1,11 +1,12 @@
+from flask_login import login_required
+
 from music_catalog import music_catalog
 
 from .controllers.base import (
     get_about, get_albums, get_index, get_logout, get_post_contact,
     get_post_login, get_post_register, get_singers, get_songs,
-    get_user_profile, get_user_profile_id,
+    get_user_profile_id,
 )
-from .controllers.utils import login_required
 
 
 @music_catalog.route("/")
@@ -39,13 +40,8 @@ def logout():
     return get_logout()
 
 
-@music_catalog.route("/profile/<username>")
-def profile(username):
-    return get_user_profile(username)
-
-
 @music_catalog.route("/profile/<int:id>")
-def prof(id):
+def profile(id):
     return get_user_profile_id(id)
 
 
