@@ -23,6 +23,7 @@ db = SQLAlchemy(music_catalog, metadata=metadata_obj)
 
 login_manager = LoginManager(music_catalog)
 login_manager.login_view = "login"
+login_manager.login_message_category = "error"
 
 toolbar = DebugToolbarExtension(music_catalog)
 

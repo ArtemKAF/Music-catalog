@@ -15,4 +15,10 @@ def save_in_db(obj) -> None:
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        raise Exception("Ошибка сохранения в БД!", error)
+        details = details_db_error(repr(error))
+        raise Exception("Ошибка сохранения в БД!", details)
+
+
+def details_db_error(error: str) -> str:
+    details = error.split("DETAIL:  ")[-1].split("\\n")[0]
+    return details

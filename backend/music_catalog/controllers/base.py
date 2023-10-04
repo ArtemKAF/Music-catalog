@@ -2,7 +2,6 @@ from flask import (
     abort, flash, redirect, render_template, request, session, url_for,
 )
 from flask_login import current_user, login_user, logout_user
-from werkzeug.security import generate_password_hash
 
 from ..forms.forms import LoginForm, RegisterForm
 from ..models import Album, Singer, Song, User
@@ -49,7 +48,7 @@ def get_post_login():
         user = User.query.filter_by(email=form.email.data).first()
         if (
             user is not None
-            or user.password_hash == generate_password_hash(form.password.data)
+            and user.check_password(form.password.data)
         ):
             login_user(user, remember=form.remember_me.data)
             return redirect(
@@ -68,11 +67,11 @@ def get_post_login():
 
 def get_post_register():
     form = RegisterForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    if form.validate_on_submit():
         user = User(
             name=request.form["name"],
             email=request.form["email"],
-            password_hash=generate_password_hash(request.form["password"])
+            password=request.form["password"]
             )
         try:
             save_in_db(user)
@@ -81,9 +80,8 @@ def get_post_register():
                 f"{error.args[0]} - {error.args[1]}",
                 category="error"
             )
+            return redirect(url_for("register"))
         return redirect(url_for("login"))
-    else:
-        flash("Некорректные регистрационные данные!", "error")
     return render_template(
         "register.html",
         tittle="Регистрация",
