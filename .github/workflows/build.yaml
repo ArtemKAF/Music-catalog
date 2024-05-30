@@ -14,6 +14,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      attestations: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,14 +23,26 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_REGISTRY_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set variables
         run: |
           echo REP_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./infra/backend/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
