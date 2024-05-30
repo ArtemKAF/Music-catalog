@@ -9,5 +9,5 @@ jobs:
 
   call_build_backend:
     name: Build and Push backend in ghrc.io
-    uses: ArtemKAF/Music_catalog/.github/workflows/build.yml@main
+    uses: ArtemKAF/Music_catalog/.github/workflows/build.yaml@main
     secrets: inherit
