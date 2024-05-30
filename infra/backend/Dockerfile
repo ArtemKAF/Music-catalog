@@ -10,8 +10,6 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM python:3.12-alpine3.19
 
-LABEL org.opencontainers.image.source https://github.com/ArtemKAF/Music-catalog
-
 RUN mkdir app
 
 RUN python -m pip install --upgrade pip --no-cache-dir
