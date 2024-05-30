@@ -1,0 +1,13 @@
+# .github/workflows/main.yml
+name: Main Music_catalog backend workflow
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+
+  call_build_backend:
+    name: Build and Push backend in ghrc.io
+    uses: ArtemKAF/Music_catalog/.github/workflows/build.yml@main
+    secrets: inherit

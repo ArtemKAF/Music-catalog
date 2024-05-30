@@ -1,0 +1,6 @@
+*
+!backend/
+!pyproject.toml
+!poetry.lock
+!infra/backend/Dockerfile
+**/__pycache__/
